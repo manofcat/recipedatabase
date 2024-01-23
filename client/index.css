@@ -47,13 +47,25 @@
     display:none;
 }
 
-.modal-img {
-    border:solid;
-    border:0;
-    outline-color:black;
-    outline:solid;
-    outline-width:3px;
-    border-color:white;
-    border-radius:30px;
+.font-style {
+    font-family: Cambria, Cochin, Georgia, Times, 'Times New Roman', serif;
+    font-weight:bold;
+}   
+
+.btn, .btn:hover, .btn:active {
+    background-color:brown;
+    border-color:brown;
 }
 
+.img-format {
+    border-radius: 5px 5px 0 0; 
+}
+
+.modal-9-format {
+    margin-bottom:10px;
+}
+
+.ingredients-format {
+    padding:0;
+    margin-left:-8px;
+}
