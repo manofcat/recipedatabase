@@ -4,39 +4,77 @@ const fs = require('fs');
 
 app.use(express.static('client'));
 app.use(express.json());
-app.use(express.urlencoded({extended: true}));
+app.use(express.urlencoded({ extended: true }));
 
+// = []
 let recipes = require('./recipeDatabase.json');
+
+// = []
 let users = require('./users.json');
 
 // GET Methods
 // users = [ {username : "", password : "", "favourites" : [], "own_recipes" : []} ]
-app.get('/users/check', function(req,resp) {
+app.get('/users/all', function (req, resp) {
+    resp.send(users);
+});
+
+app.get('/users/check', function (req, resp, next) {
     potentialUsername = req.query.username;
     potentialPassword = req.query.password;
-    for (let i = 0; i< users.length; i += 1) {
+    for (let i = 0; i < users.length; i += 1) {
         if (users[i].username == potentialUsername && users[i].password == potentialPassword) {
-            resp.send(["Welcome " + potentialUsername,true])
+            resp.send(['Welcome ' + potentialUsername, true]);
+            return next();
         } else {
             continue;
         }
-        resp.send(["Either your username or password was wrong.",false])
     }
+    resp.send(['Either your username or password was wrong.', false]);
 });
 
-app.get('/users/favourites', function(req,resp) {
-    
+// gives attributes of a single user
+app.get('/users/attributes', function (req, resp) {
+    nameOfUser = req.query.username;
+    result = [];
+    for (let i = 0; i < users.length; i += 1) {
+        if (users[i].username.toLowerCase() == nameOfUser.toLowerCase()) {
+            result.push(users[i]);
+        }
+    };
+    resp.send(result);
 });
 
-app.get('/recipe/all', function (req,resp) {
-    resp.send(recipes)
+app.get('/users/ownedrecipes', function (req, resp) {
+    userName = req.query.username;
+    result = [];
+    for (let i = 0; i < users.length; i += 1) {
+        if (users[i].username.toLowerCase() == userName.toLowerCase()) {
+            for (let j = 0; j < users.length; j += 1) {
+                result.push(users[i].own_recipes[j]);
+            }
+        }
+    };
+    resp.send(result);
+});
+// app.get('/users/favourites', function (req, resp) {
+// });
+
+app.get('/recipe/all', function (req, resp) {
+    resp.send(recipes);
 });
 
-app.get('recipe/id/all', function (req,resp) {
-    result = []
-    for (let i = 0; i<recipes.length; i += 1) {
-        result.push(recipes[i].id);
+app.get('/recipe/attributes', function (req, resp) {
+    recipeName = req.query.name;
+    if (recipeName.includes('+')) {
+        recipeName = recipeName.replace(/\+/g, ' ');
     }
+    result = [];
+    for (let i = 0; i < recipes.length; i += 1) {
+        if (recipes[i].name.toLowerCase() == recipeName.toLowerCase()) {
+            result.push(recipes[i]);
+        }
+    }
+    resp.send(result);
 });
 
 app.get('/recipe/search', function (req, resp) {
@@ -84,38 +122,53 @@ app.get('/recipe/search', function (req, resp) {
 
 // POST Methods
 
-app.post("/recipe/new", function (req, resp) {
-    let recipe = req.body;
+app.post('/recipe/new', function (req, resp) {
+    const recipe = req.body;
     resp.send(recipe);
     recipes.push(recipe);
     recipes = JSON.stringify(recipes);
     fs.writeFileSync('./recipeDatabase.json', recipes);
 });
 
-app.post("/users/new", function(req,resp) {
-    let user = req.body;
+app.post('/users/new', function (req, resp) {
+    const user = req.body;
     resp.send(user);
     users.push(user);
     users = JSON.stringify(users);
-    fs.writeFileSync('./users.json',users)
+    fs.writeFileSync('./users.json', users);
 });
 
 // {to : "username", recipe : {...}}
-app.post("/users/new/favourite", function(req,resp) {
-    let data = req.body;
+// not implemented sorry
+app.post('/users/new/favourite', function (req, resp) {
+    const data = req.body;
     resp.send(data);
     toUser = data.to;
     newUserFavourite = data.recipe;
     for (let i = 0; i < users.length; i += 1) {
         if (users[i].username == toUser) {
             users[i].favourites.push(newUserFavourite);
-        }
-        else {
-            continue
+        } else {
+            continue;
         }
     }
     users = JSON.stringify(users);
-    fs.writeFileSync('./users.json', users)
+    fs.writeFileSync('./users.json', users);
+});
+
+// {created_by : "", name : "", image : "", ingredients : [{ingredient : ""}], instructions : [], ................etc}
+app.post('/users/new/createdby', function (req, resp) {
+    const recipeData = req.body;
+    resp.send(recipeData);
+    for (let i = 0; i < users.length; i += 1) {
+        if (users[i].username == recipeData.created_by) {
+            users[i].own_recipes.push(recipeData);
+        } else {
+            continue;
+        }
+    }
+    users = JSON.stringify(users);
+    fs.writeFileSync('./users.json', users);
 });
 
 module.exports = app;
