@@ -78,7 +78,7 @@
     font-weight: bold;
 }   
 
-.btn, .btn:hover, .btn:active {
+.btn, .btn:hover, .btn:active, .btn:disabled {
     background-color:brown;
     --bs-btn-active-bg: #771f1f;
     --bs-btn-active-border-color: #771f1f;

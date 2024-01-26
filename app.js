@@ -49,11 +49,15 @@ app.get('/users/ownedrecipes', function (req, resp) {
     result = [];
     for (let i = 0; i < users.length; i += 1) {
         if (users[i].username.toLowerCase() == userName.toLowerCase()) {
-            for (let j = 0; j < users.length; j += 1) {
+            for (let j = 0; j < users[i].own_recipes.length; j += 1) {
                 result.push(users[i].own_recipes[j]);
             }
+        } else {
+            continue;
         }
     };
+    console.log(result);
+    console.log(typeof (result));
     resp.send(result);
 });
 // app.get('/users/favourites', function (req, resp) {

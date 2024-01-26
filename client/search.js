@@ -1,6 +1,3 @@
-//Create a get method with the attribute selected
-//Get all possible values of attribute selected e.g. names or ingredient
-//
 
 // resultcontainer = document.getElementById("result-container")
 // inputbox = document.getElementById("input-box")
@@ -313,6 +310,11 @@ rcf.addEventListener("submit", async function(event) {
             });
             if (response1.ok) {
                 let jsonContent1 = await response1.json();
+                results_container = document.getElementById("recipe-results-container")
+                results_container.innerHTML = 'Recipe Created!'
+                setTimeout(() => {
+                    results_container.innerHTML = '';
+                  }, 2000);
             } else {
                 throw Error(response.statusText + "-" + response.url)
             }
@@ -332,7 +334,12 @@ ownedrecipes.addEventListener("click", async function (event) {
         let response = await fetch('http://127.0.0.1:8080/users/ownedrecipes?username=' + username)
         if (response.ok) {
             let owned = await response.json();
-            cardnmodalcreator(owned);
+            console.log(owned.length)
+            if (owned.length < 1) {
+                document.getElementById("card-container").innerHTML = '<h2 class="text-center">You haven\'t created any recipes yet.</h2>'
+            } else {
+                cardnmodalcreator(owned);
+            }
         } else {
             throw Error(response.statusText + "-" + response.url)
         }
